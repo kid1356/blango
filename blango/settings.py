@@ -61,6 +61,7 @@ class Dev(Configuration):
       'allauth.socialaccount.providers.google',
       'rest_framework',
       'rest_framework.authtoken',
+      'drf_yasg',
   ]
 
   MIDDLEWARE = [
@@ -86,7 +87,12 @@ class Dev(Configuration):
   INTERNAL_IPS = ["192.168.10.226"]
 
   ROOT_URLCONF = 'blango.urls'
-
+  SWAGGER_SETTINGS = {
+        "SECURITY_DEFINITIONS": {
+            "Token": {"type": "apiKey", "name": "Authorization", "in": "header"},
+            "Basic": {"type": "basic"},
+        }
+    }
   TEMPLATES = [
       {
           'BACKEND': 'django.template.backends.django.DjangoTemplates',
