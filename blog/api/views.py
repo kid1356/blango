@@ -13,7 +13,7 @@ from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied
 from datetime import timedelta
 from django.http import Http404
-
+from blog.api.filters import PostFilterSet
 # class PostList(generics.ListCreateAPIView):
 #     queryset = Post.objects.all()
 #     serializer_class = PostSerializer
@@ -36,9 +36,14 @@ class UserDetail(generics.RetrieveAPIView):
 class TagViewSet(viewsets.ModelViewSet):
   queryset = Tag.objects.all()
   serializer_class = TagSerializer
+
   @action(methods=["get"], detail=True, name="Posts with the Tag")
   def posts(self, request, pk=None):
       tag = self.get_object()
+      page = self.paginate_queryset(tag.posts)
+      if page is not None:
+        post_serializer = PostSerializer(page, many = True, context = {"request":request})
+        return self.get_paginated_response(serializer.data)
       post_serializer = PostSerializer(
             tag.posts, many=True, context={"request": request}
       )
@@ -55,6 +60,8 @@ class TagViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     permission_classes = [AuthorModifyOrReadOnly | IsAdminUserForObject]
     queryset = Post.objects.all()
+    filterset_class = PostFilterSet
+    ordering_fields = ["published_at", "author", "title", "slug"]
 
     def get_serializer_class(self):
         if self.action in ("list", "create"):
@@ -69,8 +76,13 @@ class PostViewSet(viewsets.ModelViewSet):
     def mine(self,request):
       if request.user.is_anonymous:
         raise PermissionDenied("You must logged in to see which Posts are yours")
-
       posts = self.get_queryset().filter(author = request.user)
+      posts = self.paginate_queryset(posts)
+      
+      if page is not None:
+        serializer = post_serializer(posts, many=True, context = {"request":request})
+        return self.get_paginated_response(serializer.data)
+ 
       serializer = PostSerializer(posts, many = True, context={"request":request})
       
       return Response(serializer.data)
