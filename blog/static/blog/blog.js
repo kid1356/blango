@@ -1,86 +1,124 @@
-// // // alert('Hello, world!')
-// // const theNumber = 1
-// // let yourName = 'Ben'
+// // // // alert('Hello, world!')
+// // // const theNumber = 1
+// // // let yourName = 'Ben'
 
-// // if (theNumber === 1) {
-// //   let yourName = 'Leo'
-// //   alert(yourName)
+// // // if (theNumber === 1) {
+// // //   let yourName = 'Leo'
+// // //   alert(yourName)
+// // // }
+
+// // // // alert(yourName)
+
+// // class Greeter {
+// //   constructor (name) {
+// //     this.name = name
+// //   }
+
+// //   getGreeting () {
+// //     if (this.name === undefined) {
+// //       return 'Hello, no name'
+// //     }
+
+// //     return 'Hello, ' + this.name
+// //   }
+
+// //   showGreeting (greetingMessage) {
+// //     console.log(greetingMessage)
+// //   }
+
+// //   greet () {
+// //     this.showGreeting(this.getGreeting())
+// //   }
 // // }
 
-// // // alert(yourName)
+// // const g = new Greeter('Patchy')  // Put your name here if you like
+// // g.greet()
 
-// class Greeter {
-//   constructor (name) {
-//     this.name = name
-//   }
+// // class DelayedGreeter extends Greeter {
+// //   delay = 2000
 
-//   getGreeting () {
-//     if (this.name === undefined) {
-//       return 'Hello, no name'
-//     }
+// //   constructor (name, delay) {
+// //     super(name)
+// //     if (delay !== undefined) {
+// //       this.delay = delay
+// //     }
+// //   }
 
-//     return 'Hello, ' + this.name
-//   }
+// //   greet () {
+// //     setTimeout(
+// //       () => {
+// //         this.showGreeting(this.getGreeting())
+// //       }, this.delay
+// //     )
+// //   }
+// // }
 
-//   showGreeting (greetingMessage) {
-//     console.log(greetingMessage)
-//   }
+// // const dg2 = new DelayedGreeter('Patchy 2 Seconds')
+// // dg2.greet()
 
-//   greet () {
-//     this.showGreeting(this.getGreeting())
-//   }
+// // const dg1 = new DelayedGreeter('Patchy 1 Second', 1000)
+// // dg1.greet()
+
+// function resolvedCallback(data) {
+//   console.log('Resolved with data ' +  data)
 // }
 
-// const g = new Greeter('Patchy')  // Put your name here if you like
-// g.greet()
+// function rejectedCallback(message) {
+//   console.log('Rejected with message ' + message)
+// }
 
-// class DelayedGreeter extends Greeter {
-//   delay = 2000
-
-//   constructor (name, delay) {
-//     super(name)
-//     if (delay !== undefined) {
-//       this.delay = delay
+// const lazyAdd = function (a, b) {
+//   const doAdd = (resolve, reject) => {
+//     if (typeof a !== "number" || typeof b !== "number") {
+//       reject("a and b must both be numbers")
+//     } else {
+//       const sum = a + b
+//       resolve(sum)
 //     }
 //   }
 
-//   greet () {
-//     setTimeout(
-//       () => {
-//         this.showGreeting(this.getGreeting())
-//       }, this.delay
-//     )
-//   }
+//   return new Promise(doAdd)
 // }
 
-// const dg2 = new DelayedGreeter('Patchy 2 Seconds')
-// dg2.greet()
+// const p = lazyAdd(3, 4)
+// p.then(resolvedCallback, rejectedCallback)
 
-// const dg1 = new DelayedGreeter('Patchy 1 Second', 1000)
-// dg1.greet()
+// lazyAdd("nan", "alsonan").then(resolvedCallback, rejectedCallback)
 
-function resolvedCallback(data) {
-  console.log('Resolved with data ' +  data)
-}
-
-function rejectedCallback(message) {
-  console.log('Rejected with message ' + message)
-}
-
-const lazyAdd = function (a, b) {
-  const doAdd = (resolve, reject) => {
-    if (typeof a !== "number" || typeof b !== "number") {
-      reject("a and b must both be numbers")
-    } else {
-      const sum = a + b
-      resolve(sum)
-    }
+class ClickButton extends React.Component {
+  state = {
+    wasClicked: false
   }
 
-  return new Promise(doAdd)
+  handleClick () {
+    this.setState(
+      {wasClicked: true}
+    )
+  }
+
+  render () {
+    let buttonText
+
+    if (this.state.wasClicked)
+      buttonText = 'Clicked!'
+    else
+      buttonText = 'Click Me'
+
+    return React.createElement(
+      'button',
+      {
+        className: 'btn btn-primary mt-2',
+        onClick: () => {
+          this.handleClick()
+        }
+      },
+      buttonText
+    )
+  }
 }
 
-const p = lazyAdd(3, 4)
-p.then(resolvedCallback, rejectedCallback)
-
-lazyAdd("nan", "alsonan").then(resolvedCallback, rejectedCallback)
+const domContainer = document.getElementById('react_root')
+ReactDOM.render(
+  React.createElement(ClickButton),
+  domContainer
+)
